@@ -17,31 +17,18 @@ function generatePassword() {
 /* 
 Call prompt pop-up windows with questions of user preferences
 if user select cancel at any prompt window (validation for null) - it's assumed that user want to cancel this process
-selectedCharactersUserChoice variable is used to generate string with symbols by user choice.
 */
   passwordLengthValue = passwordLength();
   if (passwordLengthValue>=8 && passwordLengthValue<=128) {
     isUppercase = uppercase();
     if (isUppercase!=null) {
-      if (isUppercase === 1) {
-        selectedCharactersUserChoice += strUppercaseRange;
-      }
       isLowercase = lowercase();
       if (isLowercase!=null) {
-        if (isLowercase === 1) {
-          selectedCharactersUserChoice += strLowercaseRange;
-        }
         isNumeric = numeric();
         if (isNumeric!=null) {
-          if (isNumeric === 1) {
-            selectedCharactersUserChoice += strNumericRange;
-          }
           isSpecialCharacters = specialCharacters();
           if (isSpecialCharacters!=null) {
             status = true;
-            if (isSpecialCharacters === 1) {
-              selectedCharactersUserChoice += strSpecialCharactersRange;
-            }
           }
         } 
       } 
@@ -57,6 +44,20 @@ selectedCharactersUserChoice variable is used to generate string with symbols by
       +"\n - lowercase \n - uppercase "
       +"\n - numeric \n - special characters");
     } else {
+      // prepare selectedCharactersUserChoice variable which is used to generate password by user's choice group of characters.
+      if (isUppercase === 1) {
+        selectedCharactersUserChoice += strUppercaseRange;
+      }
+      if (isLowercase === 1) {
+        selectedCharactersUserChoice += strLowercaseRange;
+      }
+      if (isNumeric === 1) {
+        selectedCharactersUserChoice += strNumericRange;
+      }
+      if (isSpecialCharacters === 1) {
+        selectedCharactersUserChoice += strSpecialCharactersRange;
+      }
+
       let selectedCharactersUserChoiceLength = selectedCharactersUserChoice.length;
       function getRandomInt(selectedCharactersUserChoiceLength) {
         return Math.floor(Math.random() * selectedCharactersUserChoiceLength);
@@ -71,8 +72,7 @@ selectedCharactersUserChoice variable is used to generate string with symbols by
     }
   }
 
-// Functions to call prompt messages.
-// prompt message with question about the password length
+// Functions to call prompt messages with answer's validation.
 function passwordLength() {
   while (true) {
     let answer = window.prompt("Password length (8 - 128): ", 20);
@@ -88,6 +88,8 @@ function passwordLength() {
           return null;
         }
       }
+    } else {
+      return null;
     }
   }
 }
@@ -106,6 +108,8 @@ function uppercase() {
           return null;
         }
       }
+    } else {
+      return null;
     }
   }
 }
@@ -124,33 +128,48 @@ function lowercase() {
           return null;
         }
       }
+    } else {
+      return null;
     }
   }
 }
 
 function numeric() {
-  let numericValue = window.prompt("Numeric (Yes / No): ", "Yes");
-  if (numericValue.toLowerCase() === "yes") {
-    return 1;  
-  } else if (numericValue.toLowerCase() === "no") {
-    return 0;
-  } else {
-    window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
+  while (true) {
+    let numericValue = window.prompt("Numeric (Yes / No): ", "Yes");
+    if (numericValue) {
+      if (numericValue.toLowerCase() === "yes") {
+        return 1;  
+      } else if (numericValue.toLowerCase() === "no") {
+        return 0;
+      } else {
+        let isContinue = window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
+        if (!isContinue) {
+          return null;
+        }
+      }
+    } else {
+      return null;
+    }
   }
 }
 
 function specialCharacters() {
   while (true) {
     let specialCharactersValue = window.prompt("Special Characters (Yes / No): ", "Yes");
-    if (specialCharactersValue.toLowerCase() === "yes") {
-      return 1;  
-    } else if (specialCharactersValue.toLowerCase() === "no") {
-      return 0;
-    } else {
-      let isContinue = window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
-      if (!isContinue) {
-        return null;
+    if (specialCharactersValue) {
+      if (specialCharactersValue.toLowerCase() === "yes") {
+        return 1;  
+      } else if (specialCharactersValue.toLowerCase() === "no") {
+        return 0;
+      } else {
+        let isContinue = window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
+        if (!isContinue) {
+          return null;
+        }
       }
+    } else {
+      return null;
     }
   }
 }
@@ -162,8 +181,10 @@ var generateBtn = document.querySelector("#generate");
 function writePassword() {
   var password = generatePassword();
   var passwordText = document.querySelector("#password");
-
-  passwordText.value = password;
+  let isPasswordValid = typeof password;
+  if (isPasswordValid != 'undefined') {
+    passwordText.value = password;
+  }
 }
 
 // Add event listener to generate button
