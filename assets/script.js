@@ -1,104 +1,157 @@
 // Group of characters for password
-const strSpecialCharactersRange = "!@#$%^&*()<>,.";
+const strSpecialCharactersRange = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
 const strUppercaseRange = "QWERTYUIOPASDFGHJKLZXCVBNM";
 const strLowercaseRange = "qwertyuiopasdfghjklzxcvbnm";
 const strNumericRange = "1234567890";
 
 // Generate password function
 function generatePassword() {
-  let passwordLengthValue = passwordLength();
-  let isUppercase = uppercase();
-  let isLowercase = lowercase();
-  let isNumeric = numeric();
-  let isSpecialCharacters = specialCharacters();
-
+  let passwordLengthValue;
+  let isUppercase;
+  let isLowercase;
+  let isNumeric;
+  let isSpecialCharacters;
   let selectedCharactersUserChoice = "";
-  if (isLowercase) {
-    selectedCharactersUserChoice += strLowercaseRange;
-  }
-  if (isUppercase) {
-    selectedCharactersUserChoice += strUppercaseRange;
-  }
-  if (isNumeric) {
-    selectedCharactersUserChoice += strNumericRange;
-  }
-  if (isSpecialCharacters) {
-    selectedCharactersUserChoice += strSpecialCharactersRange;
+  let status = false;
+
+/* 
+Call prompt pop-up windows with questions of user preferences
+if user select cancel at any prompt window (validation for null) - it's assumed that user want to cancel this process
+selectedCharactersUserChoice variable is used to generate string with symbols by user choice.
+*/
+  passwordLengthValue = passwordLength();
+  if (passwordLengthValue>=8 && passwordLengthValue<=128) {
+    isUppercase = uppercase();
+    if (isUppercase!=null) {
+      if (isUppercase === 1) {
+        selectedCharactersUserChoice += strUppercaseRange;
+      }
+      isLowercase = lowercase();
+      if (isLowercase!=null) {
+        if (isLowercase === 1) {
+          selectedCharactersUserChoice += strLowercaseRange;
+        }
+        isNumeric = numeric();
+        if (isNumeric!=null) {
+          if (isNumeric === 1) {
+            selectedCharactersUserChoice += strNumericRange;
+          }
+          isSpecialCharacters = specialCharacters();
+          if (isSpecialCharacters!=null) {
+            status = true;
+            if (isSpecialCharacters === 1) {
+              selectedCharactersUserChoice += strSpecialCharactersRange;
+            }
+          }
+        } 
+      } 
+    } 
   }
 
-  let selectedCharactersUserChoiceLength = selectedCharactersUserChoice.length;
-  if (selectedCharactersUserChoiceLength>0) {
-    function getRandomInt(selectedCharactersUserChoiceLength) {
-      return Math.floor(Math.random() * selectedCharactersUserChoiceLength); // The maximum is exclusive and the minimum is inclusive
+    /*validate that user selected at least one group of characters
+    New Password is generated when selected at least one group of characters*/
+    if (isLowercase===0 && isUppercase===0 && isNumeric===0 && isSpecialCharacters===0) {
+      window.alert("To generate password you have to select at least one group of characters."
+      +"If you want to try again, please click [Generate Password] button on the main screen."
+      +"\nAnswer 'Yes' to at least one group of characters: "
+      +"\n - lowercase \n - uppercase "
+      +"\n - numeric \n - special characters");
+    } else {
+      let selectedCharactersUserChoiceLength = selectedCharactersUserChoice.length;
+      function getRandomInt(selectedCharactersUserChoiceLength) {
+        return Math.floor(Math.random() * selectedCharactersUserChoiceLength);
+      }
+      
+      var newPassword = "";
+      while(passwordLengthValue--) {
+        let charIndex = getRandomInt(selectedCharactersUserChoiceLength);
+        newPassword += selectedCharactersUserChoice.charAt(charIndex); 
+      }
+      return newPassword;
     }
-    
-    var newPassword = "";
-    while(passwordLengthValue--) {
-      let charIndex = getRandomInt(selectedCharactersUserChoiceLength);
-      newPassword += selectedCharactersUserChoice.charAt(charIndex); 
-    }
-    return newPassword;
-  } else {
-    return null;
   }
-  
+
+// Functions to call prompt messages.
+// prompt message with question about the password length
+function passwordLength() {
+  while (true) {
+    let answer = window.prompt("Password length (8 - 128): ", 20);
+    if (answer) {
+      if (answer>=8 && answer<=128) {
+        return answer;
+      }
+      if (typeof answer ==='string') {
+        let isContinue = window.confirm("Expected input a number from 8 up to 128. "
+        + "\n\nPassword length should be at least 8 characters and no more than 128 characters. "
+        + "If you want to try again, please click [Generate Password] button on the main screen.");
+        if (!isContinue) {
+          return null;
+        }
+      }
+    }
+  }
 }
 
-// Functions for prompt messages
-function passwordLength() {
-  let length = Number(window.prompt("Password length: ", "20"));
-  if (length>=8 && length<=128) {
-    return length;  
-  } else {
-    window.alert("Password length should be at least 8 characters and no more than 128 characters.")
-    passwordLength();
-  }
-}    
 function uppercase() {
-  let uppercaseValue = window.prompt("Lowercase (Yes / No): ", "Yes");
-  if (uppercaseValue.toLowerCase() === "yes") {
-    return true;  
-  } else if (uppercaseValue.toLowerCase() === "no") {
-    return false;
-  } else {
-    window.alert ("Accepted Values: Yes or No")
-    uppercase();
+  while (true) {
+    let uppercaseValue = window.prompt("Uppercase (Yes / No): ", "Yes");
+    if (uppercaseValue) {
+      if (uppercaseValue.toLowerCase() === "yes") {
+        return 1;  
+      } else if (uppercaseValue.toLowerCase() === "no") {
+        return 0;
+      } else {
+        let isContinue = window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
+        if (!isContinue) {
+          return null;
+        }
+      }
+    }
   }
 }
 
 function lowercase() {
-  let lowercaseValue = window.prompt("Lowercase (Yes / No): ", "Yes");
-  if (lowercaseValue.toLowerCase() === "yes") {
-    return true;  
-  } else if (lowercaseValue.toLowerCase() === "no") {
-    return false;
-  } else {
-    window.alert ("Accepted Values: Yes or No")
-    lowercase();
+  while (true) {
+    let lowercaseValue = window.prompt("Lowercase (Yes / No): ", "Yes");
+    if (lowercaseValue) {
+      if (lowercaseValue.toLowerCase() === "yes") {
+        return 1;  
+      } else if (lowercaseValue.toLowerCase() === "no") {
+        return 0;
+      } else {
+        let isContinue = window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
+        if (!isContinue) {
+          return null;
+        }
+      }
+    }
   }
 }
 
 function numeric() {
   let numericValue = window.prompt("Numeric (Yes / No): ", "Yes");
   if (numericValue.toLowerCase() === "yes") {
-    return true;  
+    return 1;  
   } else if (numericValue.toLowerCase() === "no") {
-    return false;
+    return 0;
   } else {
-    window.alert ("Accepted Values: Yes or No")
-    numeric();
+    window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
   }
 }
 
 function specialCharacters() {
-  let specialCharactersValue = window.prompt("Special Characters (Yes / No): ", "Yes");
-  if (specialCharactersValue.toLowerCase() === "yes") {
-    return true;  
-  } else if (specialCharactersValue.toLowerCase() === "no") {
-    return false;
-  } else {
-    window.alert ("Accepted Values: Yes or No")
-    specialCharacters();
+  while (true) {
+    let specialCharactersValue = window.prompt("Special Characters (Yes / No): ", "Yes");
+    if (specialCharactersValue.toLowerCase() === "yes") {
+      return 1;  
+    } else if (specialCharactersValue.toLowerCase() === "no") {
+      return 0;
+    } else {
+      let isContinue = window.confirm ("Accepted Values: Yes or No. Do you want to contunue?");
+      if (!isContinue) {
+        return null;
+      }
+    }
   }
 }
 
