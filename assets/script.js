@@ -1,9 +1,3 @@
-// Group of characters for password
-const strSpecialCharactersRange = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-const strUppercaseRange = "QWERTYUIOPASDFGHJKLZXCVBNM";
-const strLowercaseRange = "qwertyuiopasdfghjklzxcvbnm";
-const strNumericRange = "1234567890";
-
 // Generate password function
 function generatePassword() {
   let passwordLengthValue;
@@ -11,12 +5,12 @@ function generatePassword() {
   let isLowercase;
   let isNumeric;
   let isSpecialCharacters;
-  let selectedCharactersUserChoice = "";
   let status = false;
 
 /* 
 Call prompt pop-up windows with questions of user preferences
-if user select cancel at any prompt window (validation for null) - it's assumed that user want to cancel this process
+If user select cancel at any prompt window (validation for null) - it's assumed that user want to cancel this process
+When user answer the preferences - random passowrd will be returned.
 */
   passwordLengthValue = passwordLength();
   if (passwordLengthValue>=8 && passwordLengthValue<=128) {
@@ -29,48 +23,52 @@ if user select cancel at any prompt window (validation for null) - it's assumed 
           isSpecialCharacters = specialCharacters();
           if (isSpecialCharacters!=null) {
             status = true;
+            return randomPassword(passwordLengthValue, isUppercase, isLowercase, isNumeric, isSpecialCharacters);
           }
         } 
       } 
     } 
   }
+}
 
-    /*validate that user selected at least one group of characters
-    New Password is generated when selected at least one group of characters*/
-    if (isLowercase===0 && isUppercase===0 && isNumeric===0 && isSpecialCharacters===0) {
-      window.alert("To generate password you have to select at least one group of characters."
-      +"If you want to try again, please click [Generate Password] button on the main screen."
-      +"\nAnswer 'Yes' to at least one group of characters: "
-      +"\n - lowercase \n - uppercase "
-      +"\n - numeric \n - special characters");
-    } else {
-      // prepare selectedCharactersUserChoice variable which is used to generate password by user's choice group of characters.
-      if (isUppercase === 1) {
-        selectedCharactersUserChoice += strUppercaseRange;
-      }
-      if (isLowercase === 1) {
-        selectedCharactersUserChoice += strLowercaseRange;
-      }
-      if (isNumeric === 1) {
-        selectedCharactersUserChoice += strNumericRange;
-      }
-      if (isSpecialCharacters === 1) {
-        selectedCharactersUserChoice += strSpecialCharactersRange;
-      }
+// function to generate password with selected length and 1 or 0 to include group of chracters or not
+function randomPassword(passwordLengthValue, isUppercase, isLowercase, isNumeric, isSpecialCharacters) {
+  // Group of characters for password
+const strSpecialCharactersRange = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+const strUppercaseRange = "QWERTYUIOPASDFGHJKLZXCVBNM";
+const strLowercaseRange = "qwertyuiopasdfghjklzxcvbnm";
+const strNumericRange = "1234567890";
 
-      let selectedCharactersUserChoiceLength = selectedCharactersUserChoice.length;
-      function getRandomInt(selectedCharactersUserChoiceLength) {
-        return Math.floor(Math.random() * selectedCharactersUserChoiceLength);
-      }
-      
-      var newPassword = "";
-      while(passwordLengthValue--) {
-        let charIndex = getRandomInt(selectedCharactersUserChoiceLength);
-        newPassword += selectedCharactersUserChoice.charAt(charIndex); 
-      }
-      return newPassword;
+let selectedCharactersUserChoice = "";
+  /*validate that user selected at least one group of characters
+  New Password is generated when selected at least one group of characters*/
+  if (isLowercase===0 && isUppercase===0 && isNumeric===0 && isSpecialCharacters===0) {
+    window.alert("To generate password you have to select at least one group of characters."
+    +"If you want to try again, please click [Generate Password] button on the main screen."
+    +"\nAnswer 'Yes' to at least one group of characters: "
+    +"\n - lowercase \n - uppercase "
+    +"\n - numeric \n - special characters");
+  } else {
+    // prepare selectedCharactersUserChoice variable which is used to generate password by user's choice group of characters.
+    if (isUppercase === 1) {selectedCharactersUserChoice += strUppercaseRange;}
+    if (isLowercase === 1) {selectedCharactersUserChoice += strLowercaseRange;}
+    if (isNumeric === 1) {selectedCharactersUserChoice += strNumericRange;}
+    if (isSpecialCharacters === 1) {selectedCharactersUserChoice += strSpecialCharactersRange;}
+
+    let selectedCharactersUserChoiceLength = selectedCharactersUserChoice.length;
+    //function to generate random number between 0 and number equal to length of String with characters
+    function getRandomInt(selectedCharactersUserChoiceLength) {
+      return Math.floor(Math.random() * selectedCharactersUserChoiceLength);
     }
+    // genrate random number, find character in the string, using this nuber as index
+    var newPassword = "";
+    while(passwordLengthValue--) {
+      let charIndex = getRandomInt(selectedCharactersUserChoiceLength);
+      newPassword += selectedCharactersUserChoice.charAt(charIndex); 
+    }
+    return newPassword;
   }
+}
 
 // Functions to call prompt messages with answer's validation.
 function passwordLength() {
@@ -83,7 +81,7 @@ function passwordLength() {
       if (typeof answer ==='string') {
         let isContinue = window.confirm("Expected input a number from 8 up to 128. "
         + "\n\nPassword length should be at least 8 characters and no more than 128 characters. "
-        + "If you want to try again, please click [Generate Password] button on the main screen.");
+        + "Click [ OK ] if you want to continue.");
         if (!isContinue) {
           return null;
         }
