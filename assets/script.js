@@ -1,3 +1,9 @@
+// Group of characters for password
+const strSpecialCharactersRange = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
+const strUppercaseRange = "QWERTYUIOPASDFGHJKLZXCVBNM";
+const strLowercaseRange = "qwertyuiopasdfghjklzxcvbnm";
+const strNumericRange = "1234567890";
+
 // Generate password function
 function generatePassword() {
   let passwordLengthValue;
@@ -5,69 +11,104 @@ function generatePassword() {
   let isLowercase;
   let isNumeric;
   let isSpecialCharacters;
-  let status = false;
-
 /* 
 Call prompt pop-up windows with questions of user preferences
 If user select cancel at any prompt window (validation for null) - it's assumed that user want to cancel this process
 When user answer the preferences - random passowrd will be returned.
 */
   passwordLengthValue = passwordLength();
-  if (passwordLengthValue>=8 && passwordLengthValue<=128) {
-    isUppercase = uppercase();
-    if (isUppercase!=null) {
-      isLowercase = lowercase();
-      if (isLowercase!=null) {
-        isNumeric = numeric();
-        if (isNumeric!=null) {
-          isSpecialCharacters = specialCharacters();
-          if (isSpecialCharacters!=null) {
-            status = true;
-            return randomPassword(passwordLengthValue, isUppercase, isLowercase, isNumeric, isSpecialCharacters);
-          }
-        } 
-      } 
-    } 
+  if (passwordLengthValue===null) {
+    return;
   }
-}
-
-// function to generate password with selected length and 1 or 0 to include group of chracters or not
-function randomPassword(passwordLengthValue, isUppercase, isLowercase, isNumeric, isSpecialCharacters) {
-  // Group of characters for password
-const strSpecialCharactersRange = "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~";
-const strUppercaseRange = "QWERTYUIOPASDFGHJKLZXCVBNM";
-const strLowercaseRange = "qwertyuiopasdfghjklzxcvbnm";
-const strNumericRange = "1234567890";
-
-let selectedCharactersUserChoice = "";
-  /*validate that user selected at least one group of characters
+  isUppercase = uppercase();
+  if (isUppercase===null) {
+    return;
+  } 
+  isLowercase = lowercase();
+  if (isLowercase===null) {
+    return;
+  } 
+  isNumeric = numeric();
+  if (isNumeric===null) {
+    return;
+  }
+  isSpecialCharacters = specialCharacters();
+  if (isSpecialCharacters===null) {
+    return;
+  }
+// initialize ranges based on user's answers
+  let inclusionRanges = [];
+  if (isUppercase === 1) {
+    inclusionRanges.push({range:strUppercaseRange, isPresent: false});
+  }
+  if (isLowercase === 1) {
+    inclusionRanges.push({range:strLowercaseRange, isPresent: false});
+  }
+  if (isNumeric === 1) {
+    inclusionRanges.push({range:strNumericRange, isPresent: false});
+  }
+  if (isSpecialCharacters === 1) {
+    inclusionRanges.push({range:strSpecialCharactersRange, isPresent: false});
+  }
+    /*validate that user selected at least one group of characters
   New Password is generated when selected at least one group of characters*/
-  if (isLowercase===0 && isUppercase===0 && isNumeric===0 && isSpecialCharacters===0) {
+  if (inclusionRanges.length === 0) {
     window.alert("To generate password you have to select at least one group of characters."
     +"If you want to try again, please click [Generate Password] button on the main screen."
     +"\nAnswer 'Yes' to at least one group of characters: "
     +"\n - lowercase \n - uppercase "
     +"\n - numeric \n - special characters");
-  } else {
-    // prepare selectedCharactersUserChoice variable which is used to generate password by user's choice group of characters.
-    if (isUppercase === 1) {selectedCharactersUserChoice += strUppercaseRange;}
-    if (isLowercase === 1) {selectedCharactersUserChoice += strLowercaseRange;}
-    if (isNumeric === 1) {selectedCharactersUserChoice += strNumericRange;}
-    if (isSpecialCharacters === 1) {selectedCharactersUserChoice += strSpecialCharactersRange;}
-
-    let selectedCharactersUserChoiceLength = selectedCharactersUserChoice.length;
-    //function to generate random number between 0 and number equal to length of String with characters
-    function getRandomInt(selectedCharactersUserChoiceLength) {
-      return Math.floor(Math.random() * selectedCharactersUserChoiceLength);
-    }
-    // genrate random number, find character in the string, using this nuber as index
-    var newPassword = "";
-    while(passwordLengthValue--) {
-      let charIndex = getRandomInt(selectedCharactersUserChoiceLength);
-      newPassword += selectedCharactersUserChoice.charAt(charIndex); 
-    }
-    return newPassword;
+    return;
   }
+  // prepare selectedCharactersUserChoice variable which is used to generate password by user's choice group of characters.
+  let selectedCharactersUserChoice = "";
+  inclusionRanges.forEach(r => selectedCharactersUserChoice+=r.range);
+
+  while (true) {
+    let newPassword = randomPassword(passwordLengthValue, selectedCharactersUserChoice);
+    if (validateInclusion(newPassword, inclusionRanges)) {
+      return newPassword;
+    }
+  }
+}
+
+// function to generate password with selected length and 1 or 0 to include group of chracters or not
+function randomPassword(passwordLengthValue, selectedCharactersUserChoice) {
+
+  let selectedCharactersUserChoiceLength = selectedCharactersUserChoice.length;
+  //function to generate random number between 0 and number equal to length of String with characters
+  function getRandomInt(selectedCharactersUserChoiceLength) {
+    return Math.floor(Math.random() * selectedCharactersUserChoiceLength);
+  }
+  // genrate random number, find character in the string, using this nuber as index
+  var newPassword = "";
+  while(passwordLengthValue--) {
+    let charIndex = getRandomInt(selectedCharactersUserChoiceLength);
+    newPassword += selectedCharactersUserChoice.charAt(charIndex); 
+  }
+  return newPassword;
+}
+
+function validateInclusion(password, inclusionRanges) {
+  for (let i=0; i<password.length; i++){
+    let testChar = password.charAt(i);
+    for (let j=0; j<inclusionRanges.length; j++) {
+      let rangeVal = inclusionRanges[j];
+      if (!rangeVal.isPresent) {
+        if (rangeVal.range.indexOf(testChar)>=0) {
+          rangeVal.isPresent = true;
+        }
+      }
+    }
+  }
+
+  for (let j=0; j<inclusionRanges.length; j++) {
+    let rangeVal = inclusionRanges[j];
+    if (!rangeVal.isPresent) {
+      return false;
+    }
+  }
+  return true;
 }
 
 // Functions to call prompt messages with answer's validation.
