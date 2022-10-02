@@ -66,7 +66,6 @@ When user answer the preferences - random passowrd will be returned.
 
   while (true) {
     let newPassword = randomPassword(passwordLengthValue, selectedCharactersUserChoice);
-    console.log(newPassword);
     if (validateInclusion(newPassword, inclusionRanges)) {
       return newPassword;
     }
